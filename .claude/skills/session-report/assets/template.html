@@ -1,0 +1,293 @@
+<title>예창패 2027 현황판</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{
+  --ground:#F4F6F2; --paper:#FFFFFF; --ink:#1C2420; --muted:#5B6660; --line:#C9D1CB;
+  --board:#1F6B52; --board-soft:#E3EFE9; --pencil:#D6961A; --pencil-soft:#FBF0DA;
+  --ok:#1F7A4D; --warn:#A96A00; --risk:#B23A3A; --risk-soft:#F8E4E2; --track:#E4E9E5;
+  --display:"Do Hyeon","IBM Plex Sans KR",system-ui,sans-serif;
+  --body:"IBM Plex Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#141A17; --paper:#1C2420; --ink:#E6ECE8; --muted:#9AA7A0; --line:#34403A;
+    --board:#6CC4A0; --board-soft:#1F3229; --pencil:#EDB64A; --pencil-soft:#352A14;
+    --ok:#6CC49A; --warn:#E8B04A; --risk:#EE8A84; --risk-soft:#3A2220; --track:#26302B;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#141A17; --paper:#1C2420; --ink:#E6ECE8; --muted:#9AA7A0; --line:#34403A;
+  --board:#6CC4A0; --board-soft:#1F3229; --pencil:#EDB64A; --pencil-soft:#352A14;
+  --ok:#6CC49A; --warn:#E8B04A; --risk:#EE8A84; --risk-soft:#3A2220; --track:#26302B;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font:15px/1.6 var(--body);padding-inline:16px;padding-block:28px 64px}
+.wrap{max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:36px}
+h1,h2{font-family:var(--display);font-weight:400;margin:0;text-wrap:balance}
+h1{font-size:clamp(28px,5.5vw,40px);line-height:1.15}
+h2{font-size:23px;line-height:1.2}
+p{margin:0}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.12em;color:var(--board)}
+.muted{color:var(--muted)}
+header{display:flex;flex-direction:column;gap:10px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;font:500 12px/1.4 var(--mono);color:var(--muted)}
+section{display:flex;flex-direction:column;gap:14px}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.sec-head .muted{font-size:13px}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.kpi{background:var(--paper);padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.kpi .k{font:500 11px/1.3 var(--mono);letter-spacing:.06em;color:var(--muted)}
+.kpi .v{font-family:var(--display);font-size:30px;line-height:1.1;font-variant-numeric:tabular-nums}
+.kpi .s{font-size:13px;color:var(--muted)}
+.kpi.alert .v{color:var(--risk)}
+.kpi.good .v{color:var(--ok)}
+
+/* stages */
+.stages{display:flex;flex-direction:column;gap:0;background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.stage{display:grid;grid-template-columns:28px minmax(120px,190px) 1fr 92px;gap:12px;align-items:center;padding:11px 16px;border-bottom:1px solid var(--line)}
+.stage:last-child{border-bottom:0}
+.stage .no{font:500 12px var(--mono);color:var(--muted)}
+.stage .nm{font-weight:500}
+.stage .bar{height:8px;background:var(--track);border-radius:4px;overflow:hidden}
+.stage .bar i{display:block;height:100%;background:var(--board);border-radius:4px}
+.stage .ct{font:500 12px var(--mono);color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.stage.done .nm{color:var(--muted)}
+.stage.current{background:var(--pencil-soft)}
+.stage.current .nm{font-weight:700}
+.stage.current .bar i{background:var(--pencil)}
+.stage.current .no{color:var(--warn)}
+.blockers{grid-column:2/-1;display:flex;flex-direction:column;gap:4px;margin-top:4px;font-size:13.5px}
+.blockers li{list-style:none;padding-left:18px;position:relative}
+.blockers li::before{content:"";position:absolute;left:2px;top:.55em;width:9px;height:9px;border:1.5px solid var(--warn);border-radius:2px}
+.blockers li.ok::before{background:var(--ok);border-color:var(--ok)}
+.blockers ul{margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+@media (max-width:620px){
+  .stage{grid-template-columns:24px 1fr 70px}
+  .stage .bar{grid-column:2/-1;grid-row:2}
+  .blockers{grid-column:1/-1}
+}
+
+/* session */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:680px){.grid2{grid-template-columns:1fr}}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.panel h3{margin:0;font:500 12px/1 var(--mono);letter-spacing:.08em;color:var(--muted)}
+.panel.resolved{border-color:var(--board)}
+.panel.resolved h3{color:var(--ok)}
+.panel.newq h3{color:var(--warn)}
+.list{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.qa{display:flex;flex-direction:column;gap:2px;padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.qa:last-child{border-bottom:0;padding-bottom:0}
+.qa .q{font-weight:700}
+.qa .q::before{content:"✓ ";color:var(--ok)}
+.qa .a{color:var(--muted);font-size:14px}
+.empty{color:var(--muted);font-size:14px}
+
+/* open questions */
+.oq{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.oq-row{display:grid;grid-template-columns:64px 1fr auto;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.chip{display:inline-block;font:500 11px/1 var(--mono);padding:4px 7px;border-radius:4px;white-space:nowrap}
+.c-stage{background:var(--board-soft);color:var(--board)}
+.c-now{background:var(--pencil-soft);color:var(--warn)}
+.c-age{color:var(--muted);font:500 11px var(--mono)}
+.c-pass{background:var(--board-soft);color:var(--ok)}
+.c-partial{background:var(--pencil-soft);color:var(--warn)}
+.c-todo{border:1px dashed var(--line);color:var(--muted)}
+.c-risk{background:var(--risk-soft);color:var(--risk)}
+
+/* diff */
+.checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.check{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.check .n{font-weight:700;font-size:14px}
+.check .t{font-size:13px;color:var(--muted)}
+.cand{font-size:15px}
+.cand b{font-weight:700}
+
+/* next */
+ol.next{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px;font-size:15.5px}
+ol.next li::marker{font-family:var(--mono);color:var(--board)}
+
+/* history */
+.hist{display:flex;flex-direction:column;gap:0;border-left:2px solid var(--line);margin-left:6px}
+.h-item{position:relative;padding:0 0 18px 20px}
+.h-item::before{content:"";position:absolute;left:-7px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--ground);border:2px solid var(--board)}
+.h-item:first-child::before{background:var(--board)}
+.h-item .d{font:500 12px var(--mono);color:var(--muted)}
+.h-item .ti{font-weight:700}
+.h-item .sm{font-size:14px;color:var(--muted)}
+footer{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+code{font-family:var(--mono);font-size:12.5px}
+</style>
+
+<script id="dashboard-data" type="application/json">__DASHBOARD_DATA__</script>
+
+<div class="wrap" id="app">
+  <header>
+    <div class="eyebrow" id="eyebrow"></div>
+    <h1 id="title"></h1>
+    <div class="meta" id="meta"></div>
+  </header>
+
+  <div class="kpis" id="kpis"></div>
+
+  <section>
+    <div class="sec-head"><h2>단계 진행</h2><span class="muted">통과 조건을 모두 채워야 다음 단계로 갑니다</span></div>
+    <div class="stages" id="stages"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>이번 세션</h2><span class="muted" id="session-label"></span></div>
+    <div class="grid2">
+      <div class="panel resolved"><h3>해결된 고민</h3><div id="s-resolved"></div></div>
+      <div class="panel"><h3>한 일</h3><div id="s-done"></div></div>
+      <div class="panel"><h3>결정한 것</h3><div id="s-decisions"></div></div>
+      <div class="panel newq"><h3>새로 생긴 고민</h3><div id="s-new"></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>지금 고민 중</h2><span class="muted" id="oq-count"></span></div>
+    <div class="oq" id="oq"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>차별점 검증</h2><span class="muted" id="diff-score"></span></div>
+    <p class="cand" id="diff-cand"></p>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section id="risk-sec">
+    <div class="sec-head"><h2>리스크 수용</h2><span class="muted">통과 조건을 못 채운 채 넘어간 항목</span></div>
+    <div class="oq" id="risks"></div>
+  </section>
+
+  <section>
+    <h2>다음에 할 일</h2>
+    <ol class="next" id="next"></ol>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>세션 기록</h2><span class="muted" id="hist-count"></span></div>
+    <div class="hist" id="hist"></div>
+  </section>
+
+  <footer id="footer"></footer>
+</div>
+
+<script>
+(function(){
+  var data;
+  try { data = JSON.parse(document.getElementById('dashboard-data').textContent); }
+  catch(e){ document.getElementById('app').textContent = '보고서 데이터를 읽지 못했습니다: ' + e.message; return; }
+
+  function el(tag, cls, text){ var n=document.createElement(tag); if(cls) n.className=cls; if(text!=null) n.textContent=text; return n; }
+  function $(id){ return document.getElementById(id); }
+  function days(a,b){ return Math.round((new Date(b+'T00:00:00') - new Date(a+'T00:00:00'))/86400000); }
+  function listOrEmpty(host, items, emptyText){
+    if(!items || !items.length){ host.appendChild(el('p','empty',emptyText)); return; }
+    var ul=el('ul','list'); items.forEach(function(t){ ul.appendChild(el('li',null,t)); }); host.appendChild(ul);
+  }
+
+  var p = data.project, sessions = data.sessions || [], cur = sessions[sessions.length-1] || {};
+  var reportDate = cur.date || p.updated_at;
+  var stages = data.stages || [];
+  var curStage = stages.filter(function(s){return s.status==='current';})[0];
+  var diff = data.differentiation || {checks:[]};
+  var passCount = diff.checks.filter(function(c){return c.status==='pass';}).length;
+  var oq = data.open_questions || [];
+  var dday = p.deadline ? days(reportDate, p.deadline) : null;
+
+  $('eyebrow').textContent = '세션 현황 보고서 · ' + reportDate + (cur.no ? ' · #' + cur.no : '');
+  $('title').textContent = p.title;
+  var meta = $('meta');
+  [ '대표자 ' + p.representative, '사업계획서 마감 목표 ' + p.deadline, '누적 세션 ' + sessions.length + '회' ].forEach(function(t){ meta.appendChild(el('span',null,t)); });
+
+  // KPIs
+  var k = $('kpis');
+  function kpi(label, value, sub, mod){ var d=el('div','kpi'+(mod?' '+mod:'')); d.appendChild(el('span','k',label)); d.appendChild(el('span','v',value)); if(sub) d.appendChild(el('span','s',sub)); k.appendChild(d); }
+  kpi('현재 단계', curStage ? curStage.id + '단계' : '—', curStage ? curStage.name : '');
+  kpi('이 단계 통과 조건', curStage ? curStage.done + '/' + curStage.total : '—', curStage && curStage.done===curStage.total ? '다음 단계 가능' : '채워야 다음 단계', curStage && curStage.done===curStage.total ? 'good' : null);
+  kpi('차별점 검증', passCount + '/' + diff.checks.length, passCount===diff.checks.length && diff.checks.length ? '확정' : '검증 중', passCount===diff.checks.length && diff.checks.length ? 'good':null);
+  kpi('남은 고민', String(oq.length), '이번 세션 해결 ' + ((cur.resolved||[]).length) + '개');
+  kpi('마감까지', dday==null ? '—' : 'D-' + dday, p.deadline, dday!=null && dday<30 ? 'alert' : null);
+
+  // stages
+  var sh = $('stages');
+  stages.forEach(function(s){
+    var row = el('div','stage '+s.status);
+    row.appendChild(el('span','no', String(s.id)));
+    var nm = el('span','nm', s.name + (s.status==='done' ? ' ✓' : '')); row.appendChild(nm);
+    var bar = el('div','bar'); var fill = el('i'); fill.style.width = (s.total ? Math.round(s.done/s.total*100) : 0) + '%'; bar.appendChild(fill); row.appendChild(bar);
+    row.appendChild(el('span','ct', s.done + '/' + s.total + (s.target ? ' · ' + s.target.slice(5) : '')));
+    if(s.status==='current' && s.items && s.items.length){
+      var b = el('div','blockers'); var ul = el('ul');
+      s.items.forEach(function(it){ ul.appendChild(el('li', it.done ? 'ok' : null, it.text)); });
+      b.appendChild(ul); row.appendChild(b);
+    }
+    sh.appendChild(row);
+  });
+
+  // session
+  $('session-label').textContent = (cur.date || '') + (cur.title ? ' · ' + cur.title : '');
+  var rs = $('s-resolved');
+  if(cur.resolved && cur.resolved.length){ cur.resolved.forEach(function(r){ var d=el('div','qa'); d.appendChild(el('span','q',r.question)); d.appendChild(el('span','a',r.answer)); rs.appendChild(d); }); }
+  else rs.appendChild(el('p','empty','이번 세션에 해결된 고민은 없습니다.'));
+  listOrEmpty($('s-done'), cur.done, '기록 없음');
+  listOrEmpty($('s-decisions'), cur.decisions, '이번 세션에 새로 결정한 것은 없습니다.');
+  listOrEmpty($('s-new'), cur.new_questions, '새로 생긴 고민은 없습니다.');
+
+  // open questions
+  $('oq-count').textContent = oq.length + '개';
+  var oh = $('oq');
+  if(!oq.length) oh.appendChild(el('p','empty','남은 고민이 없습니다.'));
+  oq.forEach(function(q){
+    var r = el('div','oq-row');
+    var isNow = curStage && q.stage===curStage.id;
+    r.appendChild(el('span','chip '+(isNow?'c-now':'c-stage'), q.stage + '단계'));
+    r.appendChild(el('span',null,q.text));
+    r.appendChild(el('span','c-age', q.since ? days(q.since, reportDate) + '일째' : ''));
+    oh.appendChild(r);
+  });
+
+  // differentiation
+  $('diff-score').textContent = passCount + '/' + diff.checks.length + ' 통과';
+  var dc = $('diff-cand'); dc.appendChild(el('b',null,'후보: ')); dc.appendChild(document.createTextNode(diff.candidate || '미정'));
+  var labels = {pass:'통과', partial:'일부', todo:'미검증'};
+  diff.checks.forEach(function(c){
+    var d = el('div','check'); d.appendChild(el('span','chip c-'+c.status, labels[c.status]||c.status));
+    d.appendChild(el('span','n',c.name)); if(c.note) d.appendChild(el('span','t',c.note)); $('checks').appendChild(d);
+  });
+
+  // risks
+  var risks = data.risks || [];
+  if(!risks.length){ $('risks').appendChild(el('p','empty','없음 — 모든 단계를 조건대로 진행 중입니다.')); }
+  risks.forEach(function(r){ var row=el('div','oq-row'); row.appendChild(el('span','chip c-risk', r.stage + '단계')); row.appendChild(el('span',null,r.text)); row.appendChild(el('span','c-age', r.accepted_at||'')); $('risks').appendChild(row); });
+
+  // next
+  (data.next_actions||[]).forEach(function(t){ $('next').appendChild(el('li',null,t)); });
+
+  // history
+  $('hist-count').textContent = sessions.length + '회';
+  sessions.slice().reverse().forEach(function(s){
+    var d = el('div','h-item');
+    d.appendChild(el('div','d', s.date + (s.no ? ' · #' + s.no : '')));
+    d.appendChild(el('div','ti', s.title || ''));
+    var sum = []; if(s.resolved && s.resolved.length) sum.push('해결 ' + s.resolved.length); if(s.decisions && s.decisions.length) sum.push('결정 ' + s.decisions.length); if(s.new_questions && s.new_questions.length) sum.push('새 고민 ' + s.new_questions.length);
+    if(sum.length) d.appendChild(el('div','sm', sum.join(' · ')));
+    $('hist').appendChild(d);
+  });
+
+  var f = $('footer');
+  f.appendChild(document.createTextNode('근거 파일: '));
+  f.appendChild(el('code',null,'context/roadmap.md')); f.appendChild(document.createTextNode(' · '));
+  f.appendChild(el('code',null,'context/open-questions.md')); f.appendChild(document.createTextNode(' · '));
+  f.appendChild(el('code',null,'context/decisions.md')); f.appendChild(document.createTextNode(' · 데이터 '));
+  f.appendChild(el('code',null,'reports/dashboard-data.json'));
+})();
+</script>

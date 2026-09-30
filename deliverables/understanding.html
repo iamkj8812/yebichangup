@@ -1,0 +1,316 @@
+<title>예창패 2027 이해도</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{
+  --ground:#F4F6F2; --paper:#FFFFFF; --ink:#1C2420; --muted:#5B6660; --line:#C9D1CB;
+  --board:#1F6B52; --board-soft:#E3EFE9; --pencil:#D6961A; --pencil-soft:#FBF0DA;
+  --ok:#1F7A4D; --warn:#A96A00; --risk:#B23A3A; --risk-soft:#F8E4E2;
+  --display:"Do Hyeon","IBM Plex Sans KR",system-ui,sans-serif;
+  --body:"IBM Plex Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#141A17; --paper:#1C2420; --ink:#E6ECE8; --muted:#9AA7A0; --line:#34403A;
+    --board:#6CC4A0; --board-soft:#1F3229; --pencil:#EDB64A; --pencil-soft:#352A14;
+    --ok:#6CC49A; --warn:#E8B04A; --risk:#EE8A84; --risk-soft:#3A2220;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#141A17; --paper:#1C2420; --ink:#E6ECE8; --muted:#9AA7A0; --line:#34403A;
+  --board:#6CC4A0; --board-soft:#1F3229; --pencil:#EDB64A; --pencil-soft:#352A14;
+  --ok:#6CC49A; --warn:#E8B04A; --risk:#EE8A84; --risk-soft:#3A2220;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font:15px/1.65 var(--body);padding-inline:16px;padding-block:32px 64px}
+.wrap{max-width:880px;margin:0 auto;display:flex;flex-direction:column;gap:44px}
+h1,h2{font-family:var(--display);font-weight:400;text-wrap:balance;margin:0;letter-spacing:.01em}
+h1{font-size:clamp(30px,6vw,42px);line-height:1.15}
+h2{font-size:26px;line-height:1.2}
+p{margin:0;max-width:65ch}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--board)}
+.lede{color:var(--muted)}
+header{display:flex;flex-direction:column;gap:12px}
+section{display:flex;flex-direction:column;gap:16px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 16px;font:500 12px/1.4 var(--mono);color:var(--muted)}
+
+/* status pills */
+.pill{display:inline-block;font:500 11px/1 var(--mono);padding:4px 7px;border-radius:4px;letter-spacing:.04em;white-space:nowrap;vertical-align:2px}
+.p-ok{background:var(--board-soft);color:var(--ok)}
+.p-est{background:var(--pencil-soft);color:var(--warn)}
+.p-unk{background:var(--risk-soft);color:var(--risk)}
+.p-tbd{border:1px dashed var(--line);color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:13px;color:var(--muted);align-items:center}
+
+/* journey */
+.journey{display:grid;grid-template-columns:repeat(6,1fr);gap:0;position:relative}
+.step{display:flex;flex-direction:column;gap:8px;padding-right:8px}
+.step .dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);background:var(--ground);position:relative;z-index:1}
+.step.now .dot{border-color:var(--pencil);background:var(--pencil)}
+.step .bar{height:2px;background:var(--line);margin-top:-8px;margin-bottom:6px}
+.step:last-child .bar{background:transparent}
+.step b{font-weight:700;font-size:15px}
+.step span{font-size:13px;color:var(--muted)}
+.step.now b{color:var(--warn)}
+@media (max-width:640px){
+  .journey{grid-template-columns:1fr;gap:14px}
+  .step{flex-direction:row;align-items:baseline;gap:12px}
+  .step .bar{display:none}
+  .step .dot{flex:none;transform:translateY(2px)}
+}
+
+/* figure */
+.fig{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:16px;overflow-x:auto}
+.fig svg{display:block;width:100%;min-width:640px;height:auto}
+.fig figcaption{font-size:13px;color:var(--muted);margin-top:10px}
+svg .box{fill:var(--paper);stroke:var(--line);stroke-width:1.5}
+svg .box-board{fill:var(--board-soft);stroke:var(--board);stroke-width:1.5}
+svg .box-pencil{fill:var(--pencil-soft);stroke:var(--pencil);stroke-width:2}
+svg .box-risk{fill:var(--paper);stroke:var(--risk);stroke-width:1.5;stroke-dasharray:5 4}
+svg .t{fill:var(--ink);font:700 15px var(--body)}
+svg .s{fill:var(--muted);font:400 12px var(--body)}
+svg .tag{fill:var(--warn);font:500 11px var(--mono)}
+svg .tag-risk{fill:var(--risk);font:500 11px var(--mono)}
+svg .edge{stroke:var(--muted);stroke-width:1.5;fill:none}
+svg .edge-pencil{stroke:var(--pencil);stroke-width:2;fill:none}
+svg .ah{fill:var(--muted)}
+svg .ah-p{fill:var(--pencil)}
+
+/* loop */
+.loop{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.loop .n{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:8px 12px;font-size:14px}
+.loop .n.key{border-color:var(--pencil);background:var(--pencil-soft);font-weight:700}
+.loop .arr{color:var(--muted);font-family:var(--mono)}
+
+/* facts */
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.fact{background:var(--paper);padding:16px;display:flex;flex-direction:column;gap:6px}
+.fact .k{font:500 12px/1.3 var(--mono);color:var(--muted);letter-spacing:.04em}
+.fact .v{font-size:15px}
+.fact .big{font-family:var(--display);font-size:28px;line-height:1.1;font-variant-numeric:tabular-nums}
+
+/* two col */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:640px){.duo{grid-template-columns:1fr}}
+.col{display:flex;flex-direction:column;gap:10px}
+.col h3{margin:0;font-size:14px;font:500 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+.col.up h3{color:var(--ok)} .col.down h3{color:var(--risk)}
+ul.plain{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+ul.plain li{max-width:60ch}
+
+/* table */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:14px}
+th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font:500 12px var(--mono);color:var(--muted);letter-spacing:.06em;background:var(--ground)}
+td.name{font-weight:700;white-space:nowrap}
+tr.pick td{background:var(--board-soft)}
+.lic{font-family:var(--mono);font-size:13px}
+
+/* gaps */
+.gaps{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line)}
+.gap{display:grid;grid-template-columns:120px 1fr;gap:16px;padding:14px 0;border-bottom:1px solid var(--line)}
+.gap .lvl{font:500 12px/1.4 var(--mono);padding-top:3px}
+.gap.hi .lvl{color:var(--risk)} .gap.md .lvl{color:var(--warn)} .gap.lo .lvl{color:var(--muted)}
+.gap b{display:block;margin-bottom:2px}
+.gap p{color:var(--muted);font-size:14px}
+@media (max-width:520px){.gap{grid-template-columns:1fr;gap:4px}}
+
+/* timeline */
+.tl{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;font-size:12px}
+.tl .m{font:500 11px var(--mono);color:var(--muted);text-align:center;padding-bottom:4px}
+.tl .seg{border-radius:4px;padding:6px 8px;font-size:12px;line-height:1.35;background:var(--board-soft);color:var(--ink)}
+.tl .seg.hot{background:var(--pencil-soft);border:1px solid var(--pencil);font-weight:700}
+.tl-wrap{overflow-x:auto}
+.tl-wrap .tl{min-width:620px}
+
+ol.q{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px}
+ol.q li::marker{font-family:var(--mono);color:var(--board)}
+footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+code{font-family:var(--mono);font-size:13px}
+</style>
+
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">예비창업패키지 2027 · 1단계 대표자·분야 확정</div>
+  <h1>초등 코딩교육 관리 플랫폼, 지금까지 이해한 그림</h1>
+  <p class="lede">주신 메모와 두 건의 조사(제도, 시장·기술)를 합쳐 정리한 내용입니다. 틀린 부분이나 빠진 부분을 짚어 주시면 컨텍스트 폴더에 바로 반영합니다.</p>
+  <div class="meta"><span>작성 2026-09-23</span><span>원본: 과제 폴더</span></div>
+  <div class="legend">
+    <span class="pill p-ok">확인</span>공식 출처 확인
+    <span class="pill p-est">추정</span>과거 패턴 기반
+    <span class="pill p-unk">미확인</span>문의 필요
+    <span class="pill p-tbd">미정</span>사용자 결정 필요
+  </div>
+</header>
+
+<section>
+  <h2>목표까지 가는 길</h2>
+  <div class="journey">
+    <div class="step now"><div class="dot"></div><div class="bar"></div><div><b>아이디어</b><br><span>지금 여기</span></div></div>
+    <div class="step"><div class="dot"></div><div class="bar"></div><div><b>제출</b><br><span>2027년 3월 접수 <span class="pill p-est">추정</span></span></div></div>
+    <div class="step"><div class="dot"></div><div class="bar"></div><div><b>선정</b><br><span>서류 → 인큐베이팅 → 발표</span></div></div>
+    <div class="step"><div class="dot"></div><div class="bar"></div><div><b>지원금</b><br><span>평균 4천만 원, 자부담 없음</span></div></div>
+    <div class="step"><div class="dot"></div><div class="bar"></div><div><b>사업 수행</b><br><span>협약 중 사업자 등록</span></div></div>
+    <div class="step"><div class="dot"></div><div class="bar"></div><div><b>확장</b><br><span>국내외</span></div></div>
+  </div>
+</section>
+
+<section>
+  <h2>제품 구조</h2>
+  <p>코딩 에디터를 새로 만드는 게 아니라, 기존 에디터 위에 <b>수업 운영과 결과 분석</b>을 얹는 제품으로 이해했습니다. 차별점 후보는 노란색 칸입니다.</p>
+  <figure class="fig" style="margin:0">
+    <svg viewBox="0 0 760 380" role="img" aria-label="어드민, 선생님, 학생이 역할별 대시보드를 거쳐 관리 기능과 분석 기능을 쓰고, 그 아래 코딩 에디터와 개인정보 요건이 있는 구조">
+      <defs>
+        <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="ap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah-p" d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+      <!-- roles -->
+      <rect class="box" x="40" y="20" width="180" height="58" rx="8"/>
+      <text class="t" x="130" y="44" text-anchor="middle">어드민</text>
+      <text class="s" x="130" y="64" text-anchor="middle">모든 기능 제어·확장</text>
+      <rect class="box" x="290" y="20" width="180" height="58" rx="8"/>
+      <text class="t" x="380" y="44" text-anchor="middle">선생님</text>
+      <text class="s" x="380" y="64" text-anchor="middle">수업·학생 관리, 피드백</text>
+      <rect class="box" x="540" y="20" width="180" height="58" rx="8"/>
+      <text class="t" x="630" y="44" text-anchor="middle">학생 (초1~6)</text>
+      <text class="s" x="630" y="64" text-anchor="middle">수업 선택·학습·결과 확인</text>
+      <line class="edge" x1="130" y1="78" x2="130" y2="108" marker-end="url(#a)"/>
+      <line class="edge" x1="380" y1="78" x2="380" y2="108" marker-end="url(#a)"/>
+      <line class="edge" x1="630" y1="78" x2="630" y2="108" marker-end="url(#a)"/>
+      <!-- dashboard -->
+      <rect class="box-board" x="40" y="110" width="680" height="46" rx="8"/>
+      <text class="t" x="380" y="139" text-anchor="middle">역할별 대시보드 — 로그인한 사람에 따라 다르게 구성</text>
+      <line class="edge" x1="205" y1="156" x2="205" y2="188" marker-end="url(#a)"/>
+      <line class="edge" x1="555" y1="156" x2="555" y2="188" marker-end="url(#a)"/>
+      <!-- core -->
+      <rect class="box" x="40" y="190" width="330" height="66" rx="8"/>
+      <text class="t" x="205" y="218" text-anchor="middle">수업 · 커리큘럼 · 학생 관리</text>
+      <text class="s" x="205" y="240" text-anchor="middle">기존 LMS들도 갖춘 기본 기능</text>
+      <rect class="box-pencil" x="390" y="190" width="330" height="66" rx="8"/>
+      <text class="t" x="555" y="218" text-anchor="middle">학습 결과 분석 · 피드백</text>
+      <text class="tag" x="555" y="240" text-anchor="middle">차별점 후보 · 핵심 기술</text>
+      <!-- data flow -->
+      <line class="edge" x1="205" y1="256" x2="205" y2="308" marker-end="url(#a)"/>
+      <path class="edge-pencil" d="M330 310 V282 H555 V259" marker-end="url(#ap)"/>
+      <text class="tag" x="570" y="286">학습 기록</text>
+      <!-- base -->
+      <rect class="box" x="40" y="310" width="330" height="52" rx="8"/>
+      <text class="t" x="205" y="333" text-anchor="middle">코딩 에디터</text>
+      <text class="s" x="205" y="351" text-anchor="middle">Entry 넣기 (잠정 권고)</text>
+      <rect class="box-risk" x="390" y="310" width="330" height="52" rx="8"/>
+      <text class="t" x="555" y="333" text-anchor="middle">개인정보 · 보호자 동의</text>
+      <text class="tag-risk" x="555" y="351" text-anchor="middle">만 14세 미만 필수 요건</text>
+    </svg>
+    <figcaption>어드민 전담 개발자 대신, 설정만 바꿔 기능을 켜고 끄는 구조로 설계하는 안도 검토 대상입니다.</figcaption>
+  </figure>
+
+  <div class="loop" aria-label="수업 루프">
+    <span class="n">선생님이 커리큘럼 제공</span><span class="arr">→</span>
+    <span class="n">학생 학습</span><span class="arr">→</span>
+    <span class="n key">결과 자동 분석</span><span class="arr">→</span>
+    <span class="n">선생님 피드백</span><span class="arr">→</span>
+    <span class="n">학생이 확인</span>
+  </div>
+</section>
+
+<section>
+  <h2>예비창업패키지 핵심 숫자</h2>
+  <p class="lede">2026년 공고(중기부 공고 제2026-143호) 기준입니다. 2027년 공고는 아직 없습니다.</p>
+  <div class="facts">
+    <div class="fact"><span class="k">평균 지원금</span><span class="big">4천만 원</span><span class="v">자부담 없음 · 1단계 최대 2천만 원 <span class="pill p-ok">확인</span></span></div>
+    <div class="fact"><span class="k">일반 / 여성 선정</span><span class="big">110 / 70명</span><span class="v">전체 약 300명 <span class="pill p-ok">확인</span></span></div>
+    <div class="fact"><span class="k">2027 접수</span><span class="big">3월</span><span class="v">2월 말~3월 초 공고 <span class="pill p-est">추정</span></span></div>
+    <div class="fact"><span class="k">평가</span><span class="v">서류(2배수) → 인큐베이팅 → 발표. 사업계획서 4항목(문제인식·실현가능성·성장전략·팀구성), 단계별 70점 미만 탈락 <span class="pill p-ok">확인</span></span></div>
+    <div class="fact"><span class="k">여성분야 자격</span><span class="v">대표자 본인이 여성. 팀 성비 무관. 경쟁률 비공개라 유불리 판단 불가 <span class="pill p-ok">확인</span></span></div>
+    <div class="fact"><span class="k">재직자 · 해외 거주자</span><span class="v">공고문에 막는 조항도 허용하는 조항도 없음. 창업진흥원 문의 필요 <span class="pill p-unk">미확인</span></span></div>
+  </div>
+</section>
+
+<section>
+  <h2>시장: 순풍과 역풍</h2>
+  <div class="duo">
+    <div class="col up">
+      <h3>순풍</h3>
+      <ul class="plain">
+        <li>초등 정보 수업 17 → 34시간 (5~6학년, 2026년 전면 적용)</li>
+        <li>늘봄학교 전국 확대로 방과후 코딩 수요 증가</li>
+        <li>AI 디지털교과서가 교육자료로 격하 → 민간 에듀테크에 빈자리</li>
+        <li>해외 초중고 코딩교육 시장 2025년 38억 달러, 연 13% 성장 전망</li>
+      </ul>
+    </div>
+    <div class="col down">
+      <h3>짚을 점</h3>
+      <ul class="plain">
+        <li><b>1~2학년 코딩 확대는 교육과정상 근거 없음.</b> 메모의 "연령이 낮아진다" 전제를 다시 봐야 함</li>
+        <li>학교 판매 시 보안인증(CSAP) 약 2~3천만 원, 약 1년</li>
+        <li>수업·학생 관리만으로는 클래스팅 등 기존 LMS와 겹침</li>
+        <li>국내 코딩교육 시장 규모는 믿을 만한 출처 부족</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>코딩 에디터 선택</h2>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>도구</th><th>라이선스</th><th>상업 서비스에 넣을 때</th><th>판단</th></tr></thead>
+      <tbody>
+        <tr><td class="name">Scratch</td><td class="lic">AGPL-3.0</td><td>수정해서 서비스하면 소스 공개 의무. 이름·캐릭터는 상표라 사용 불가</td><td>메모의 예상과 달리 가장 까다로움</td></tr>
+        <tr class="pick"><td class="name">Entry</td><td class="lic">Apache-2.0</td><td>제약 거의 없음. 에디터 넣기 공식 지원. 국내 교과서 연계. 학급 관리는 직접 개발</td><td><b>잠정 권고</b> (3~6학년) <span class="pill p-tbd">미정</span></td></tr>
+        <tr><td class="name">Blockly</td><td class="lic">Apache-2.0</td><td>제약 없음. 블록 엔진만 있어 캐릭터 화면 등은 직접 개발</td><td>자유도는 최고, 개발 공수도 최대</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="lede">1~2학년은 글 없이 그림 블록으로 코딩하는 별도 도구가 필요해 따로 검토합니다.</p>
+</section>
+
+<section>
+  <h2>비어 있는 곳</h2>
+  <div class="gaps">
+    <div class="gap hi"><span class="lvl">가장 먼저</span><div><b>대표자 자격</b><p>대표자는 아내분으로 확정(여성분야 지원 가능). 남은 확인: 사업자 등록 이력, 재직·거주 상황, 일반/여성 중 어느 분야로 낼지(동시 신청 불가).</p></div></div>
+    <div class="gap hi"><span class="lvl">가장 먼저</span><div><b>돈 내는 고객</b><p>학교·교육청, 방과후·늘봄 강사, 학원, 학부모 중 누구인지. 사업계획서 "문제인식"과 영업 방식이 여기서 정해집니다.</p></div></div>
+    <div class="gap md"><span class="lvl">중요</span><div><b>차별점</b><p>코딩 결과 자동 분석 → 교사용 피드백 생성이 핵심 기술 후보.</p></div></div>
+    <div class="gap md"><span class="lvl">중요</span><div><b>커리큘럼을 누가 만드나</b><p>관리 도구만으로는 약함. 첫 고객에게 줄 기본 커리큘럼이 필요합니다.</p></div></div>
+    <div class="gap md"><span class="lvl">중요</span><div><b>팀 실제 인원</b><p>기획·개발·영업·회계 중 채워진 자리. 평가 항목 중 팀구성이 있습니다.</p></div></div>
+    <div class="gap lo"><span class="lvl">나중에</span><div><b>목표 학년 범위</b><p>1~6학년 전체로 갈지, 3~6학년부터 시작할지.</p></div></div>
+  </div>
+</section>
+
+<section>
+  <h2>일정 계획</h2>
+  <div class="tl-wrap">
+    <div class="tl">
+      <div class="m">2026.09</div><div class="m">10</div><div class="m">11</div><div class="m">12</div><div class="m">2027.01</div><div class="m">02</div><div class="m">03</div>
+      <div class="seg" style="grid-column:1/2">0 셋업·조사</div>
+      <div class="seg" style="grid-column:2/3">1 대표자·분야</div>
+      <div class="seg" style="grid-column:3/4">2 고객·문제 검증</div>
+      <div class="seg" style="grid-column:4/5">3 차별점 · 4 제품 범위</div>
+      <div class="seg" style="grid-column:5/6">5 기능정의서 · 프로토타입</div>
+      <div class="seg" style="grid-column:6/7">6 사업계획서</div>
+      <div class="seg hot" style="grid-column:7/8">접수</div>
+    </div>
+  </div>
+  <p class="lede">각 단계에는 통과 조건이 있고, 조건을 채우기 전에는 다음 단계로 가지 않습니다(<code>context/roadmap.md</code>). 월 배치는 제안이며 가능한 시간에 맞춰 조정합니다.</p>
+</section>
+
+<section>
+  <h2>답이 필요한 질문</h2>
+  <ol class="q">
+    <li>대표님(아내분)은 사업자 등록 이력이 있나요? 재직 여부와 거주 국가는요?</li>
+    <li>정해진 팀원이 있나요? 어느 자리가 채워져 있나요?</li>
+    <li>이 아이템을 떠올린 계기는 무엇인가요? (주변 교사·강사, 직접 겪은 문제 등)</li>
+    <li>가장 먼저 돈을 받을 고객은 누구라고 보시나요?</li>
+    <li>커리큘럼은 직접 만들 계획인가요, 외부 것을 쓸 계획인가요?</li>
+    <li>이 과제에 한 주에 쓸 수 있는 시간은 어느 정도인가요?</li>
+  </ol>
+</section>
+
+<footer>출처와 세부 내용: <code>context/program-research.md</code>, <code>context/market-tech-research.md</code>. 이 페이지는 피드백을 받을 때마다 갱신합니다.</footer>
+</div>
